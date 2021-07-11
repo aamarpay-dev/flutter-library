@@ -15,7 +15,7 @@ class _MyViewState extends State<MyView> {
   var isloading = true;
   final Completer<InAppWebViewController> _completer =
       Completer<InAppWebViewController>();
-  bool _isLoadingPage;
+  late bool _isLoadingPage;
 
   @override
   void initState() {
@@ -34,24 +34,25 @@ class _MyViewState extends State<MyView> {
               onWebViewCreated: (InAppWebViewController webViewController) {
                 _completer.complete(webViewController);
               },
-              onLoadStart: (InAppWebViewController controller, String url) {
+              onLoadStart: (InAppWebViewController controller, Uri? url) {
                 setState(() {
                   _isLoadingPage = true;
                 });
-                if (url.split('/').contains("confirm") ||
-                    url.split('/').contains("cancel") ||
-                    url.split('/').contains("fail")) {
+                if (url.toString().split('/').contains("confirm") ||
+                    url.toString().split('/').contains("cancel") ||
+                    url.toString().split('/').contains("fail")) {
                   Navigator.pop(context, url);
                 }
               },
               onProgressChanged:
                   (InAppWebViewController controller, int url) {},
-              onLoadStop: (InAppWebViewController controller, String url) {
+              onLoadStop: (InAppWebViewController controller, Uri? url) {
                 setState(() {
                   _isLoadingPage = false;
                 });
               },
-              initialUrl: '${widget.url}',
+              // initialUrl: '${widget.url}',
+              initialUrlRequest: URLRequest(url: Uri.parse("${widget.url}")),
             ),
             _isLoadingPage
                 ? Center(child: CircularProgressIndicator())

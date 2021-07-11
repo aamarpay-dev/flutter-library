@@ -19,29 +19,29 @@ class AamarpayData<T> extends StatefulWidget {
   final customerName;
   final customerEmail;
   final customerMobile;
-  final PaymentStatus<String> paymentStatus;
-  final isLoadingStaus<bool> isLoading;
-  final readUrl<dynamic> returnUrl;
+  final PaymentStatus<String>? paymentStatus;
+  final isLoadingStaus<bool>? isLoading;
+  final readUrl<dynamic>? returnUrl;
   final customerAddress1;
   final customerAddress2;
   final customerCity;
   final customerState;
   final customerPostCode;
-  final Widget child;
+  final Widget? child;
 
   AamarpayData(
-      {@required this.url,
-      @required this.successUrl,
-      @required this.failUrl,
-      @required this.cancelUrl,
-      @required this.storeID,
-      @required this.transactionID,
-      @required this.transactionAmount,
-      @required this.signature,
+      {required this.url,
+      required this.successUrl,
+      required this.failUrl,
+      required this.cancelUrl,
+      required this.storeID,
+      required this.transactionID,
+      required this.transactionAmount,
+      required this.signature,
       this.description,
-      @required this.customerName,
-      @required this.customerEmail,
-      @required this.customerMobile,
+      required this.customerName,
+      required this.customerEmail,
+      required this.customerMobile,
       this.paymentStatus,
       this.isLoading,
       this.child,
@@ -66,19 +66,19 @@ class _AamarpayDataState<T> extends State<AamarpayData<T>> {
   Widget build(BuildContext context) {
     void paymentHandler(String value) {
       if (widget.paymentStatus != null) {
-        widget.paymentStatus(value);
+        widget.paymentStatus!(value);
       }
     }
 
     void loadingHandler(bool value) {
       if (widget.isLoading != null) {
-        widget.isLoading(value);
+        widget.isLoading!(value);
       }
     }
 
-    void urlHandler(String value) {
+    void urlHandler(String? value) {
       if (widget.returnUrl != null) {
-        widget.returnUrl(value);
+        widget.returnUrl!(value);
       }
     }
 
@@ -90,8 +90,7 @@ class _AamarpayDataState<T> extends State<AamarpayData<T>> {
               var url = "${widget.url}$value";
 
               Future.delayed(Duration(milliseconds: 200), () async {
-                Route route =
-                    MaterialPageRoute(builder: (context) => MyView(url));
+                Route route = MaterialPageRoute(builder: (context) => MyView(url));
                 Navigator.push(context, route).then((value) {
                   if (value.split('/').contains("confirm")) {
                     urlHandler(value);
@@ -120,31 +119,29 @@ class _AamarpayDataState<T> extends State<AamarpayData<T>> {
   }
 
   Future getPayment() async {
-    http.Response response = await http.post("${widget.url}/index.php", body: {
-      "store_id": widget.storeID.toString(),
-      "tran_id": widget.transactionID.toString(),
-      "success_url": widget.successUrl,
-      "fail_url": widget.failUrl,
-      "cancel_url": widget.cancelUrl,
-      "amount": widget.transactionAmount.toString(),
-      "currency": "BDT",
-      "signature_key": widget.signature,
-      "desc": widget.description == null ? "Nothing" : widget.description,
-      "cus_name": widget.customerName,
-      "cus_email": widget.customerEmail,
-      "cus_add1":
-          widget.customerAddress1 == null ? "Dhaka" : widget.customerAddress1,
-      "cus_add2":
-          widget.customerAddress2 == null ? "Dhaka" : widget.customerAddress2,
-      "cus_city": widget.customerCity == null ? "Dhaka" : widget.customerCity,
-      "cus_state":
-          widget.customerState == null ? "Dhaka" : widget.customerState,
-      "cus_postcode": widget.customerPostCode == null
-          ? "1206"
-          : widget.customerPostCode.toString(),
-      "cus_country": "Bangladesh",
-      "cus_phone": widget.customerMobile.toString(),
-    });
+    http.Response response = await http.post(
+      Uri.parse("${widget.url}/index.php"), 
+      body: {
+        "store_id": widget.storeID.toString(),
+        "tran_id": widget.transactionID.toString(),
+        "success_url": widget.successUrl,
+        "fail_url": widget.failUrl,
+        "cancel_url": widget.cancelUrl,
+        "amount": widget.transactionAmount.toString(),
+        "currency": "BDT",
+        "signature_key": widget.signature,
+        "desc": widget.description ?? "Nothing",
+        "cus_name": widget.customerName,
+        "cus_email": widget.customerEmail,
+        "cus_add1": widget.customerAddress1 ?? "Dhaka",
+        "cus_add2": widget.customerAddress2 ?? "Dhaka",
+        "cus_city": widget.customerCity ?? "Dhaka",
+        "cus_state": widget.customerState ?? "Dhaka",
+        "cus_postcode": widget.customerPostCode ?? "1206",
+        "cus_country": "Bangladesh",
+        "cus_phone": widget.customerMobile.toString(),
+      }
+    );
     if (response.statusCode == 200) {
       String mydata = response.body;
 
